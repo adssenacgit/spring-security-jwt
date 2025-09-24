@@ -3,6 +3,7 @@ package com.example.demo.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,7 +24,11 @@ public class SecurityConfiguration {
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
             "/users/login", // Url que usaremos para fazer login
             "/users", // Url que usaremos para criar um usuário
-            "/h2-console"
+            "/h2-console",
+            // 🔓 Swagger/OpenAPI UI
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
     // Endpoints que requerem autenticação para serem acessados
@@ -48,6 +53,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //adicionado para funcionamento do swagger
                         .requestMatchers(ENDPOINTS_ADMIN).hasRole("ADMINISTRATOR")
                         .requestMatchers(ENDPOINTS_CUSTOMER).hasRole("CUSTOMER")
                         .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_REQUIRED).authenticated()
